@@ -15,7 +15,9 @@
   * @param string $bookKey
   *
   * @return stdClass with the following attributes ...
-  *  ->bibleTitleOptions , a string with html options for a select
+  *  ->bibleTitleId, a string with the id of a sql row
+  *  ->bibleTitleOptions, a string with html options for a select
+  *  ->bookId, a string with the id of a sql row
   *  ->bookNameOptions, a string with html options for a select
   *  ->chapterOptions, a string with html options for a select
   *  ->notnData, a stdClass which, in turn, has the folloing attributes ...
@@ -38,12 +40,13 @@ function getViewData($bibleTitleSqlResults, $bibleKey, $bookKey) {
         $bibleTitle = $_COOKIE[$bibleKey];
         $bookName = $_COOKIE[$bookKey];
     }
+
+    list($bibleTitle, $bibleTitleOptions) = getBibleTitleSelect(
+        $bibleTitleSqlResults, $bibleTitle);
     $bibleId = getBibleId($bibleTitle);
 
-    $bibleTitleOptions = getBibleTitleSelect($bibleTitleSqlResults, $bibleTitle);
-
+    list($bookName, $bookNameOptions) = getBookNameSelect($bibleTitle, $bookName);
     $bookId = getBookId($bibleId, $bookName);
-    $bookNameOptions = getBookNameSelect($bibleTitle, $bookName);
 
     $notnData = getNotationData($bibleId, $bookId);
 
@@ -55,7 +58,9 @@ function getViewData($bibleTitleSqlResults, $bibleKey, $bookKey) {
 
     $viewData = new stdClass();
     $viewData->notnData = $notnData;
+    $viewData->bibleTitleId = $bibleId;
     $viewData->bibleTitleOptions = $bibleTitleOptions;
+    $viewData->bookId = $bookId;
     $viewData->bookNameOptions = $bookNameOptions;
     $viewData->chapterOptions = $chapterOptions;
     return $viewData;
@@ -153,7 +158,9 @@ function getBibleId($bibleTitle) {
   * @param resource, mysql_query results
   * @param string
   *
-  * @return string for html for all the select options for Bible Titles 
+  * @return array with ...
+  *   - a string with the bibleTitle (either the original one or the default one)
+  *   - a string for html for all the select options for Bible Titles 
   *
   **/
 function getBibleTitleSelect($bibleTitleSqlResults, $bibleTitle) {
@@ -166,13 +173,19 @@ function getBibleTitleSelect($bibleTitleSqlResults, $bibleTitle) {
             $selected = 'selected';
         }
 
+        if ( ! $bibleTitle and $bibleRow['displayDefault']==1) {
+            $selected = 'selected';
+            $bibleTitle = $bibleRow['title'];
+            $_POST['bibleTitle'] = $bibleRow['title'];
+        }
+
         $bibleTitleOptions .= '<option value="' .
                               $bibleRow['title'] . '" ' . $selected . '>' .
                               $bibleRow['title'] . '</option>';
     }
     mysql_data_seek($bibleTitleSqlResults, 0);
 
-    return $bibleTitleOptions;
+    return array($bibleTitle, $bibleTitleOptions);
 }
 
 /**
@@ -243,7 +256,9 @@ function getBookId($bibleId, $bookName) {
   * @param string $bibleTitle
   * @param string $bookName
   *
-  * @return string with the html select options for the books of that bible
+  * @return array with ...
+  *  - a string of the bookName (either the original one or the default)
+  *  - a string with the html select options for the books of that bible
   *
   **/
 function getBookNameSelect($bibleTitle, $bookName) {
@@ -257,13 +272,20 @@ function getBookNameSelect($bibleTitle, $bookName) {
             if ($bookRow['name'] == $bookName) {
                 $selected = 'selected';
             }
+
+            if ( ! $bookName and $bookRow['displayDefault']==1) {
+                $selected = 'selected';
+                $bookName = $bookRow['name'];
+                $_POST['bookName'] = $bookRow['name'];
+            }
+
             $bookNameOptions .= '<option value="' .
                                 $bookRow['name'] . '" ' . $selected . '>' . 
                                 $bookRow['name'] . '</option>';
         }
     }
 
-    return $bookNameOptions;
+    return array($bookName, $bookNameOptions);
 }
 
 /**
@@ -348,7 +370,7 @@ function getNotationData($bibleId, $bookId) {
                                        "\"  class=\"chapter\">" . $chapter .
                                        "</div>\r\n";
                          $chapterOptions .= "<option value=\"chapter_" .
-                                            $chapter . "\">" . $chapter;
+                                            $chapter . "\">" . $chapter . "</option>";
                      }
                      if ($verse != $sav_verse) {
                          $dnotation .= "\r\n<nobr><div id=\"verse_p" . 
@@ -367,6 +389,9 @@ function getNotationData($bibleId, $bookId) {
         // normalize data to make matching work better
         $dnotation = Normalizer::normalize($dnotation, Normalizer::FORM_KC);
 
+        $s = array("\"","\n");
+        $r = array("\\\"","<br \>");
+
         // quotes
         if (isset($quotes[0])) {
             $limit = 1;
@@ -381,9 +406,9 @@ function getNotationData($bibleId, $bookId) {
                     $reg_from = '/' . preg_quote($quote, '/') . '/';
                     $dnotation = preg_replace($reg_from, 
                         "<div id=\"quote" . $notnRow['key'] . "_" . $ii . 
-                        "\" class=\"quote\" onclick=\"setTimeout(setAnnotations('" .
+                        "\" class=\"quote\" onclick=\"setAnnotations('" .
                         $notnRow['key'] . "_" . $ii .
-                        "'), 250)\"><a href=\"#\">" .
+                        "')\"><a href=\"#\">" .
                         $quote."</a></div>", 
                         $dnotation, 1);
                     $quotes[$quote] = $notnRow['key'] . "_" . $ii;

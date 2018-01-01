@@ -8,15 +8,10 @@
 
 require "config.php";
 require "viewUtils.php";
-require "columnsScript.php";
+require "viewScript.php";
 
 $bibleTitleResults = getBibleTitleSqlResults(
                                        mysql_real_escape_string($_GET['iso']));
-
-// get Column data
-$bibleTitleOptions = '';
-$bookNameOptions = '';
-$chapterOptions = '';
 
 $viewData = getViewData($bibleTitleResults, 
                         'bibleTitle', 
@@ -45,11 +40,17 @@ $jsAnnotations = "
  <script language=JavaScript>
   <?php echo $jsAnnotations . 
              $jsSetAnnotations . 
-             $jsScrollFunctions; ?>
+             $jsScrollFunctions; 
+
+      echo getSetAnnotationsText();
+  ?>
+
+  <?php echo $jsAnnotationsOff; ?>
+
  </script>
 </head>
 
-<body class="viewColumns">
+<body class="viewColumns" onclick="annotationsOff();" >
  <div>
 
   <div id="viewAnnotationsDiv" class="viewColumns">

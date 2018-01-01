@@ -8,7 +8,7 @@
 
 require "config.php";
 require "head.php"; 
-require "columnsScript.php";
+require "viewScript.php";
 
 echo "
     <script language=JavaScript>

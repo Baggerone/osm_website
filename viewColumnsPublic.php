@@ -7,7 +7,7 @@
 /******************************************************************************/
 
 require "config.php";
-require "columnsScript.php";
+require "viewScript.php";
 
 $iso = $_GET['iso'];
 ?>

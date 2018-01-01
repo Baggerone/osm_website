@@ -6,34 +6,95 @@
 /*  Developed by:  Steve Bagwell                                              */
 /******************************************************************************/
 
+function getLangAbbrevs() {
+  $langAbbrevs = array (
+    'Akad.', 
+    'Alm.', 
+    'Ar.', 
+    'Aram.', 
+    'Bulg.', 
+    'Fa.', 
+    'Fra.', 
+    'İbr.',  // Ruth 1:6, Allah (1665)
+    'İng.',
+    'İta.',
+    'Lat.',
+    'Mac.', 
+    'Macar.', 
+    'Moğ.',  // Mog  Apokalipsis 9:9, Ali 1665
+    'Osm.',
+    'Rum.', 
+    'Skt.', 
+    'Soğ.',
+    'Soğd.',
+    'E.Tü.',  // Ruth 1:1, avrat (1665)
+    'K.Tü.',
+    'Kz.Tü.',  // Ruth 2:21 bay (1665)
+    'T.Tü.',
+    'U.Tü.',  // Ruth 2:14 etmek (1665)
+    'Y.Tü.',  
+    'Tü.',  // Ruth 1:1, avrat (1665)
+    'E.Yun.', 
+    'Yun.'
+  );
+
+  return $langAbbrevs;
+}
+
+function getAbbrevs() { // italicized
+  $abbrevs = array (
+      'bk.', // Tevrat 1 1:11 note on tenbit
+      'karş.', // Tevrat 1 32:18 note on peskes
+      'mec.',    // Tevrat 1 24:48 note on tebarek
+      '(mec)',  // Tevrat 1 2:25 not on hicab
+  );
+
+  return $abbrevs;
+}
 
 
-$jsSetAnnotations = "
+function getJsArray($jsName, $items) {
+  $jsItems = "  " . $jsName . " = [
+   ";
+
+  foreach ($items as $nextItem) {
+    $jsItems .= "'" . $nextItem . "',
+   ";
+  }
+
+  $jsItems .= "
+  ]
+";
+
+  return $jsItems;
+
+}
+
+
+function getSetAnnotationsText(
+    $styleTop="'2px'",
+    $styleLeft="'2px'"
+  ) {
+
+
+  $jsAbbrevs = getJsArray('abbrevs', getAbbrevs());
+  $jsLangAbbrevs = getJsArray('langAbbrevs', getLangAbbrevs());
+
+
+  $jsSetAnnotations = "
 
   lastNotation = '';
 
+  // Abbreviations that get italicized
+  " . $jsAbbrevs . "
+
   // Language abbreviations that need to get a special style
   // Special characters are hard to deal with in vim, so separate them out.
-  langAbbrevs = ['Akad.', 'Alm.', 'Ar.', 'Aram.', 'Bulg.', 'Fa.', 'Fra.', 'Lat.',
-                 'Mac.', 'Macar.', 'Osm.',
-                 'Rum.', 'Skt.', 'E.Yun.', 'Yun.'];
-  langAbbrevs.push('İbr.');  // Ruth 1:6, Allah (1665)
-  langAbbrevs.push('İng.');
-  langAbbrevs.push('İta.')
-  langAbbrevs.push('Moğ.');
-  langAbbrevs.push('Soğ.');
-  langAbbrevs.push('Soğd.');
-  langAbbrevs.push('E.Tü.');  // Ruth 1:1, avrat (1665)
-  langAbbrevs.push('K.Tü.');
-  langAbbrevs.push('Kz.Tü.');  // Ruth 2:21 bay (1665)
-  langAbbrevs.push('T.Tü.');
-  langAbbrevs.push('U.Tü.');  // Ruth 2:14 etmek (1665)
-  langAbbrevs.push('Y.Tü.')
-  langAbbrevs.push('Tü.');  // Ruth 1:1, avrat (1665)
-
+  " . $jsLangAbbrevs . "
  
    // Wrap a string (e.g. mec.) in a span with a class to make italicized
-  function replaceLangAbbrLite(origString, replString) {
+  // function replaceLangAbbrLite(origString, replString) {
+  function replaceAbbrev(origString, replString) {
       spanClass = 'langAbbrLite';
       outString = origString;
 
@@ -70,12 +131,16 @@ $jsSetAnnotations = "
       var a = annotations[key].split('^');
       var annDef = a[1];
 
-      // Give the language abbreviations a different style via wrapping in a span
-      annDef = replaceLangAbbrLite(annDef, 'mec.');
+      // Give the abbreviations and language abbreviations a different style via wrapping in a span
+      for (index = 0; index < abbrevs.length; index++) {
+          annDef = replaceAbbrev(annDef, abbrevs[index]);
+      }
+
 
       for (index = 0; index < langAbbrevs.length; index++) {
           annDef = replaceLangAbbrev(annDef, langAbbrevs[index]);
       }
+
       document.getElementById(\"viewAnnotations\").innerHTML = '<b>' + a[0] + '</b> : ' + annDef;
 
       var links = a[2].split('\t');
@@ -95,11 +160,15 @@ $jsSetAnnotations = "
       }
 
       document.getElementById(\"viewAnnotationsDiv\").style.visibility='visible';
-      document.getElementById(\"viewAnnotationsDiv\").style.top = '2px';
-      document.getElementById(\"viewAnnotationsDiv\").style.left = '2px';
+      document.getElementById(\"viewAnnotationsDiv\").style.top = " . $styleTop . ";
+      document.getElementById(\"viewAnnotationsDiv\").style.left = " . $styleLeft . ";
   }
 
-";
+  ";
+
+  return $jsSetAnnotations;
+
+}
 
 $jsScrollFunctions = "
 
@@ -124,4 +193,21 @@ function showColumn(colNum, iso, st, addLabel) {
   }
 
 }
+";
+
+
+$jsAnnotationsOff = "
+  var bodyClickCount = 0;
+
+  function annotationsOff()
+  {
+   bodyClickCount += 1;
+
+  //  The click on a link is counted as the first click. So, ignore that one.
+   if (bodyClickCount>1) {
+     document.getElementById('viewAnnotationsDiv').style.visibility='hidden';
+     bodyClickCount = 0;
+   }
+  }
+
 ";
