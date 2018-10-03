@@ -59,12 +59,49 @@ function getViewData($bibleTitleSqlResults, $bibleKey, $bookKey) {
     $viewData = new stdClass();
     $viewData->notnData = $notnData;
     $viewData->bibleTitleId = $bibleId;
+    $viewData->bibleTitle = $bibleTitle;
     $viewData->bibleTitleOptions = $bibleTitleOptions;
     $viewData->bookId = $bookId;
     $viewData->bookNameOptions = $bookNameOptions;
     $viewData->chapterOptions = $chapterOptions;
     return $viewData;
 }
+
+
+function getViewPHPData($bibleTitleSqlResults, $bibleKey, $bookKey) {
+    $bibleId = $_GET['bibleTitleId'];
+    $bookId = $_GET['bookId'];
+
+    if ( empty($bibleId) || empty($bookId)) {
+        return getViewData($bibleTitleSqlResults, $bibleKey, $bookKey);
+    }
+    
+    $bibleTitle = getBibleTitleFromId($bibleId);
+
+    if (empty($bibleTitle)) {
+        return getViewData($bibleTitleSqlResults, $bibleKey, $bookKey);
+    }
+
+    $notnData = getNotationData($bibleId, $bookId);
+
+    $chapterOptions = '';
+    if ($notnData !== NULL) {
+        $chapterOptions = $notnData->chapterOptions;
+    }
+
+    $viewData = new stdClass();
+    $viewData->notnData = $notnData;
+    $viewData->bibleTitleId = $bibleId;
+    $viewData->bibleTitle = $bibleTitle;
+    $viewData->bibleTitleOptions = "";
+    $viewData->bookId = $bookId;
+    $viewData->bookNameOptions = "";
+    $viewData->chapterOptions = "";
+    return $viewData;
+}
+
+
+
 
 /**
   *
@@ -307,6 +344,31 @@ function getNotationSqlResults($bibleId, $bookId) {
         '<pre> Error 201611260850' . $query.mysql_error() . '</pre>');
     return $result;
 }
+
+/**
+  *
+  * @param string $bibleId
+  *
+  * @return string
+  *
+  **/
+function getBibleTitleFromId($bibleId) {
+    $query =
+        'SELECT `title` FROM `bibleTitles` ' .
+        'WHERE `id` = ' . $bibleId . ' limit 1';
+
+    $sqlResults = mysql_query($query) or die (
+        '<pre>Error 201811220928: ' . $query.mysql_error() . '</pre>');
+
+
+    $results = mysql_fetch_array($sqlResults);
+
+    if (! empty($results)) {
+        return $results[0];
+    }
+    return '';
+}
+
 
 /**
   *

@@ -11,6 +11,8 @@
 require 'config.php';
 require "authorization.php";
 
+global $st;
+
 $marker_size = 20;
 
 if ( (!$menu_tab_access['sync.php'] and !$menu_tab_access['everything']) or $sec_password!=$myrow_us['us_pass'])
@@ -22,7 +24,7 @@ if ( (!$menu_tab_access['sync.php'] and !$menu_tab_access['everything']) or $sec
 
 // get annotations
 $bibleTitleId = 1;
-$bookId = 'Jhn';
+$bookId = 'NO_BOOK_ID';
 
 if($_POST['bibleTitle'])
 {

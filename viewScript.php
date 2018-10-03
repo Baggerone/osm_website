@@ -16,23 +16,34 @@ function getLangAbbrevs() {
     'Fa.', 
     'Fra.', 
     'İbr.',  // Ruth 1:6, Allah (1665)
+    'İbr.', // 1819 Yeni Ahit Resullerin Amali 3:1  heykele
     'İng.',
+    'İng.', //  1819 Yni Ahit Resullerin Amali 16:16  ruhul-hads
     'İta.',
     'Lat.',
     'Mac.', 
     'Macar.', 
     'Moğ.',  // Mog  Apokalipsis 9:9, Ali 1665
+    'Moğ.', // Mog with decomposed unicode 1857 Yeni Ahit  Pavlus'un Filippililere Risalesi 3:14
     'Osm.',
     'Rum.', 
     'Skt.', 
-    'Soğ.',
-    'Soğd.',
+    'Soğ.', // with decomposed unicode (NFD)
+    'Soğ',  // with composed unicode (NFC)
+    'Soğd.', // with NFC
+    'Soğd.', // with NFD
     'E.Tü.',  // Ruth 1:1, avrat (1665)
+    'E.Tü.',  //with NFD
     'K.Tü.',
+    'K.Tü.', // with NFD
     'Kz.Tü.',  // Ruth 2:21 bay (1665)
+    'Kz.Tü.',  // with NFD
     'T.Tü.',
+    'T.Tü.', // .Tu.with decomposed unicode 1857 Yeni Ahit  Pavlus'un Filippililere Risalesi 3:14
     'U.Tü.',  // Ruth 2:14 etmek (1665)
+    'U.Tü.', // with NFD
     'Y.Tü.',  
+    'Y.Tü.', // with NFD
     'Tü.',  // Ruth 1:1, avrat (1665)
     'E.Yun.', 
     'Yun.'

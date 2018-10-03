@@ -278,6 +278,15 @@ a {
     padding:0;
 }
 
+td.info {
+    border-bottom: 1px solid
+}
+
+td.info a {
+    text-decoration: underline;
+    display: inline;
+}
+
 [target=_blank] {
     text-decoration:underline;
 	font-size: .9em;
@@ -285,6 +294,16 @@ a {
     color:blue;
     margin:0;
     padding:0;
+}
+
+.bibleName {
+    font-size: 1.5em;
+    margin-left: 50px;
+}
+
+.viewPDFURL {
+    font-size: .75em;
+    margin-left: 30px;
 }
 
 .title {
@@ -329,7 +348,13 @@ body.viewColumns {
 
 td.column_button input {
     width: 70px;
-    margin-left: 60px;
+    margin-left: 10px;
+    white-space: normal;
+}
+
+td.column_button button {
+    width: 70px;
+    margin-left: 5 px;
     white-space: normal;
 }
 

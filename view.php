@@ -82,7 +82,7 @@ $jsCoordinates = "
 <head>
  <meta content="text/html; charset=UTF-8" http-equiv="content-type">
  <title><?php echo translate('View documents', $st, 'sys'); ?></title>
- <link type="text/css" rel="stylesheet" href="style.css?d=20170210">
+ <link type="text/css" rel="stylesheet" href="style.css?d=201705211">
 
  <script language=JavaScript>
   <?php echo $jsCoordinates .
@@ -371,8 +371,18 @@ $jsCoordinates = "
        <td>
          <?php echo translate('Chapter', $st, 'sys'); ?>
        </td>
-       <td class='column_button' rowspan='2'><input type='button' onclick='window.open("viewColumnsPublic.php?iso=<?php echo  $_GET['iso'] . "&st=" . $_GET['st']; ?>")'
-            value='<?php echo translate('Parallel Columns', $st, 'sys'); ?>'/>
+       <td class='column_button' rowspan='2'>
+         <table><tr>
+           <td>
+             <button type='button' onclick='window.open(
+    "viewPDF.php?bibleTitleId=<?php echo($bibleTitleId); ?>&bookId=<?php echo($bookId); ?>&iso=<?php echo  $_GET['iso'] . "&st=" . $_GET['st']; ?>")'>
+               <?php echo translate('Save as PDF', $st, 'sys'); ?></button>
+           </td>
+           <td>
+             <input type='button' onclick='window.open("viewColumnsPublic.php?iso=<?php echo  $_GET['iso'] . "&st=" . $_GET['st']; ?>")'
+             value='<?php echo translate('Parallel Columns', $st, 'sys'); ?>'/>
+           </td>
+         </tr></table>
        </td>
       </tr>
       <tr valign="top">
